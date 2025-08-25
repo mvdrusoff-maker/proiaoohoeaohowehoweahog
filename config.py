@@ -17,7 +17,7 @@ YOOMONEY_WALLET = os.getenv('YOOMONEY_WALLET', '4100119031273795')
 # Реквизиты для СБП и карты
 SBP_PHONE = os.getenv('SBP_PHONE', '+79931321491')
 BANK_CARD = os.getenv('BANK_CARD', '2204120124383866')
-BANK_NAME = os.getenv('BANK_NAME', 'Яндекс Банк')
+BANK_NAME = os.getenv('BANK_NAME', 'ЮMoney')
 RECIPIENT_NAME = os.getenv('RECIPIENT_NAME', 'Анна В.')
 
 # Настройки базы данных
