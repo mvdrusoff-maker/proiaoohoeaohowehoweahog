@@ -22,7 +22,7 @@ try:
     from config import *
 except ImportError:
     # Fallback настройки если config.py не найден
-    BOT_TOKEN = os.getenv('BOT_TOKEN', '8057715167:AAGyNg1mln9EaCZVA88G0nrGa_acDAQpyMg')
+    BOT_TOKEN = os.getenv('BOT_TOKEN', '8057715167:AAEEv01CdStyZrK_Icb6ktLppZU85tXvnHU')
     ADMIN_ID = int(os.getenv('ADMIN_ID', '7942871538'))
     YOOMONEY_WALLET = os.getenv('YOOMONEY_WALLET', '4100119031273795')
     SBP_PHONE = os.getenv('SBP_PHONE', '+79931321491')
