@@ -88,21 +88,27 @@ class YooMoneyAPI:
         
         data = {
             'grant_type': 'client_credentials',
-            'scope': 'account-info operation-history payment-p2p'
+            'scope': 'account-info operation-history'
         }
         
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.post(self.token_url, headers=headers, data=data) as response:
+                    response_text = await response.text()
+                    logger.info(f"ЮMoney API response: {response.status} - {response_text}")
+                    
                     if response.status == 200:
                         result = await response.json()
-                        self.access_token = result['access_token']
-                        self.token_expires = time.time() + result['expires_in'] - 300  # 5 минут запаса
-                        logger.info("YooMoney access token получен")
-                        return self.access_token
+                        if 'access_token' in result:
+                            self.access_token = result['access_token']
+                            self.token_expires = time.time() + result.get('expires_in', 3600) - 300
+                            logger.info("YooMoney access token получен")
+                            return self.access_token
+                        else:
+                            logger.error(f"Токен не найден в ответе: {result}")
+                            return None
                     else:
-                        error_text = await response.text()
-                        logger.error(f"Ошибка получения токена: {response.status} - {error_text}")
+                        logger.error(f"Ошибка получения токена: {response.status} - {response_text}")
                         return None
         except Exception as e:
             logger.error(f"Ошибка получения токена: {e}")
@@ -116,7 +122,7 @@ class YooMoneyAPI:
         
         headers = {
             "Authorization": f"Bearer {access_token}",
-            "Content-Type": "application/x-www-form-urlencoded"
+            "Content-Type": 'application/x-www-form-urlencoded'
         }
         
         data = {
@@ -141,7 +147,7 @@ class YooMoneyAPI:
                                 return True, operation
                     elif response.status == 401:
                         logger.error("Токен устарел, обновляем...")
-                        self.access_token = None  # Сбрасываем токен для обновления
+                        self.access_token = None
                     return False, None
         except Exception as e:
             logger.error(f"YooMoney API error: {e}")
@@ -192,31 +198,6 @@ async def init_db():
                     admin_id INTEGER,
                     created_date TEXT DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (user_id) REFERENCES users (user_id)
-                )
-            ''')
-            
-            # Таблица чатов
-            await db.execute('''
-                CREATE TABLE IF NOT EXISTS chats (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    user_id INTEGER,
-                    admin_id INTEGER,
-                    status TEXT DEFAULT 'active',
-                    created_date TEXT DEFAULT CURRENT_TIMESTAMP,
-                    UNIQUE(user_id, admin_id)
-                )
-            ''')
-            
-            # Таблица сообщений
-            await db.execute('''
-                CREATE TABLE IF NOT EXISTS messages (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    chat_id INTEGER,
-                    user_id INTEGER,
-                    message_text TEXT,
-                    is_from_admin BOOLEAN,
-                    created_date TEXT DEFAULT CURRENT_TIMESTAMP,
-                    FOREIGN KEY (chat_id) REFERENCES chats(id)
                 )
             ''')
             
@@ -301,14 +282,6 @@ def support_reasons_keyboard():
             [KeyboardButton(text="💸 Заказ не создался, но оплата прошла")],
             [KeyboardButton(text="❓ Другое")],
             [KeyboardButton(text="🔙 Главное меню")]
-        ],
-        resize_keyboard=True
-    )
-
-def chat_keyboard():
-    return ReplyKeyboardMarkup(
-        keyboard=[
-            [KeyboardButton(text="🚪 Выйти из чата")]
         ],
         resize_keyboard=True
     )
@@ -795,7 +768,7 @@ async def main():
         if access_token:
             logger.info("✅ Подключение к ЮMoney успешно")
         else:
-            logger.warning("⚠️ Не удалось подключиться к ЮMoney API")
+            logger.warning("⚠️ Не удалось подключиться к ЮMoney API. Проверьте Client ID и Client Secret.")
         
         # Запускаем фоновую задачу проверки платежей
         asyncio.create_task(check_payments_task())
@@ -803,7 +776,9 @@ async def main():
         # Останавливаем предыдущие вебхуки если были
         await bot.delete_webhook(drop_pending_updates=True)
         
+        logger.info("✅ Бот запущен и готов к работе!")
         await dp.start_polling(bot)
+        
     except Exception as e:
         logger.error(f"Ошибка запуска бота: {e}")
         await asyncio.sleep(5)
