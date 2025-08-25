@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  mrrobux-bot:
+    build: .
+    restart: always
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN}
+      - ADMIN_ID=${ADMIN_ID}
+      - YOOMONEY_WALLET=${YOOMONEY_WALLET}
+      - SBP_PHONE=${SBP_PHONE}
+      - BANK_CARD=${BANK_CARD}
+      - BANK_NAME=${BANK_NAME}
+      - RECIPIENT_NAME=${RECIPIENT_NAME}
