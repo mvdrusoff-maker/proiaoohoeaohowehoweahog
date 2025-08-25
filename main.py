@@ -103,47 +103,39 @@ async def init_db():
 
 # Клавиатуры
 def main_menu_keyboard():
-    keyboard = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
     buttons = [
-        KeyboardButton(text="💎 Задонатить"),
-        KeyboardButton(text="👤 Профиль"),
-        KeyboardButton(text="📦 Мои донаты"),
-        KeyboardButton(text="🆘 Поддержка")
+        [KeyboardButton(text="💎 Задонатить"), KeyboardButton(text="👤 Профиль")],
+        [KeyboardButton(text="📦 Мои донаты"), KeyboardButton(text="🆘 Поддержка")]
     ]
-    keyboard.add(*buttons)
+    keyboard = ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
     return keyboard
 
 def amount_choice_keyboard():
-    keyboard = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
-    buttons = [KeyboardButton(text=f"{amount} Robux") for amount in DONATION_AMOUNTS]
-    buttons.extend([
-        KeyboardButton(text="Другая сумма"),
-        KeyboardButton(text="Назад")
-    ])
-    keyboard.add(*buttons)
+    buttons = [
+        [KeyboardButton(text=f"{amount} Robux") for amount in DONATION_AMOUNTS[:2]],
+        [KeyboardButton(text=f"{amount} Robux") for amount in DONATION_AMOUNTS[2:]],
+        [KeyboardButton(text="Другая сумма"), KeyboardButton(text="Назад")]
+    ]
+    keyboard = ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
     return keyboard
 
 def payment_method_keyboard():
-    keyboard = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
     buttons = [
-        KeyboardButton(text="ЮMoney"),
-        KeyboardButton(text="СБП"),
-        KeyboardButton(text="По номеру карты"),
-        KeyboardButton(text="Назад")
+        [KeyboardButton(text="ЮMoney"), KeyboardButton(text="СБП")],
+        [KeyboardButton(text="По номеру карты"), KeyboardButton(text="Назад")]
     ]
-    keyboard.add(*buttons)
+    keyboard = ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
     return keyboard
 
 def support_reasons_keyboard():
-    keyboard = ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
     buttons = [
-        KeyboardButton(text="❌ Robux не пришли"),
-        KeyboardButton(text="⏳ Заказ долго не выполняется"),
-        KeyboardButton(text="💸 Заказ не создался, но оплата прошла"),
-        KeyboardButton(text="❓ Другое"),
-        KeyboardButton(text="🔙 Назад")
+        [KeyboardButton(text="❌ Robux не пришли")],
+        [KeyboardButton(text="⏳ Заказ долго не выполняется")],
+        [KeyboardButton(text="💸 Заказ не создался, но оплата прошла")],
+        [KeyboardButton(text="❓ Другое")],
+        [KeyboardButton(text="🔙 Назад")]
     ]
-    keyboard.add(*buttons)
+    keyboard = ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
     return keyboard
 
 # Обработчики команд
